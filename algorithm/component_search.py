@@ -1,3 +1,5 @@
+#ch07-5
+
 N = int(input())
 market = list(map(int, input().split()))
 
