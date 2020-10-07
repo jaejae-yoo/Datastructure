@@ -9,6 +9,7 @@ import os
 from PIL import Image
 import numpy as np
 from matplotlib import pyplot as plt
+import blurs
 
 
 class Node:
@@ -84,7 +85,7 @@ class circleLinkedlist:
         return self.current.item
 
 form_class=loadUiType("ImageViewer.ui")[0]
-form_class2 = loadUiType("dialog.ui")[0]
+form_class2=loadUiType("dialog.ui")[0]
 
 class AnotherWindow(QWidget, form_class2):
     def __init__(self):
@@ -108,7 +109,7 @@ class Viewer(QMainWindow, form_class):
         self.actionsouth.triggered.connect(self.south)
         self.actionnorth.triggered.connect(self.north)
         self.actiontoGray.triggered.connect(self.togray)
-        self.actionRotation.triggered.connect(self.rotation)
+        self.actionRotation.triggered.connect(self.show_new_window)
         self.movenextButton.clicked.connect(self.movenext)
         self.actionCrop.triggered.connect(self.crop)
         self.actionon.triggered.connect(self.camera)
@@ -116,7 +117,7 @@ class Viewer(QMainWindow, form_class):
         self.actionexit.triggered.connect(qApp.exit)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
-        self.hh = 600
+        self.hh = 700
         self.ww = 600
         self.cropEnable = False
         self.cameraon = False
@@ -137,8 +138,6 @@ class Viewer(QMainWindow, form_class):
         if self.cropEnable == True:
             self.selStart = self.origin - self.startPos
             self.selEnd = event.pos() - self.startPos
-            print(self.origin)
-            print(self.startPos)
             #print(self.selStart, self.selEnd)
 
             cut_begin_x = int(self.img_width_origin*self.selStart.x()/self.img_width_tran)
@@ -192,13 +191,14 @@ class Viewer(QMainWindow, form_class):
         self.hw_ratio = self.img_height_origin/self.img_width_origin
         #print(self.img_height_origin, self.img_width_origin)
 
-        if self.hw_ratio > 1:
+
+        if self.hw_ratio > 1: #세로가 더 큰 사진
             self.img_height_tran = self.hh
-            self.img_width_tran = int(self.img_height_tran/self.img_height_origin*self.img_width_origin)
+            self.img_width_tran = int((self.img_height_tran/self.img_height_origin)*self.img_width_origin)
         else:
             self.img_width_tran=self.ww
-            self.img_height_tran=int(self.img_width_tran/ self.img_width_origin*self.img_height_origin)
-            print(self.img_height_tran, self.img_width_tran)
+            self.img_height_tran=int((self.img_width_tran/ self.img_width_origin)*self.img_height_origin)
+        print(self.img_height_tran, self.img_width_tran)
 
         if self.img_width_tran < self.ww:
             self.startPos = QPoint((self.ww-self.img_width_tran) //2, 0)
@@ -206,25 +206,21 @@ class Viewer(QMainWindow, form_class):
         else:
             self.startPos = QPoint(0, (self.hh-self.img_height_tran)//2)
             self.endPos = QPoint(self.hh, self.startPos.y()+self.img_height_tran)
-        #print( self.startPos, self.endPos)
+        #print(self.startPos, self.endPos)
 
     def median(self):
-        img = cv2.imread(self.fName)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        dst4 = cv2.medianBlur(img, 9)
-        image = QImage(dst4, dst4.shape[1], dst4.shape[0], dst4.shape[1] * 3, QImage.Format_RGB888)
-        self.qPixmapVar = QPixmap(image)
-        self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
-        self.label.setPixmap(self.qPixmapVar)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        img_median = blurs.median_filter(self.img, 3,self.img_height_origin, self.img_width_origin)
+        img_median = np.require(img_median, np.uint8, 'C')
+        self.img2label(img_median)
+        QApplication.restoreOverrideCursor()
 
     def gaussian(self):
-        img = cv2.imread(self.fName)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        dst2 = cv2.GaussianBlur(img,(5,5),0)
-        image = QImage(dst2, dst2.shape[1], dst2.shape[0], dst2.shape[1] * 3, QImage.Format_RGB888)
-        self.qPixmapVar = QPixmap(image)
-        self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
-        self.label.setPixmap(self.qPixmapVar)
+        QApplication.setOverrideCursor(Qt.WaitCursor)
+        img_gauss = blurs.gauss_filter(self.img, self.img_height_origin, self.img_width_origin)
+        img_gauss = np.require(img_gauss, np.uint8, 'C')
+        self.img2label(img_gauss)
+        QApplication.restoreOverrideCursor()
 
 
     def folderselect(self):
@@ -278,8 +274,18 @@ class Viewer(QMainWindow, form_class):
         self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
         self.label.setPixmap(self.qPixmapVar)
 
+    def show_new_window(self):
+        self.w = AnotherWindow()
+        self.w.horizontalSlider.valueChanged.connect(self.rotation)
+        self.w.show()
+
+
     def rotation(self):
-        pass
+        angle = self.w.horizontalSlider.value()
+        print("%d 도로 회전합니다." % angle)
+        blurImg = blurs.angle_rotate(self.img, self.img_height_origin, self.img_width_origin)
+        blurImg = np.require(blurImg, np.uint8, 'C')
+        self.img2label(blurImg)
 
     def movenext(self):
         self.idx +=1
