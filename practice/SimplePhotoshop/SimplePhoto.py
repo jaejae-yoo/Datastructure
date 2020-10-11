@@ -117,7 +117,7 @@ class Viewer(QMainWindow, form_class):
         self.actionexit.triggered.connect(qApp.exit)
         self.rubberBand = QRubberBand(QRubberBand.Rectangle, self)
         self.origin = QPoint()
-        self.hh = 700
+        self.hh = 600
         self.ww = 600
         self.cropEnable = False
         self.cameraon = False
@@ -214,6 +214,14 @@ class Viewer(QMainWindow, form_class):
         img_median = np.require(img_median, np.uint8, 'C')
         self.img2label(img_median)
         QApplication.restoreOverrideCursor()
+        ''' cv2로 구현
+        img = cv2.imread(self.fName)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        dst4 = cv2.medianBlur(img, 9)
+        image = QImage(dst4, dst4.shape[1], dst4.shape[0], dst4.shape[1] * 3, QImage.Format_RGB888)
+        self.qPixmapVar = QPixmap(image)
+        self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
+        self.label.setPixmap(self.qPixmapVar)'''
 
     def gaussian(self):
         QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -221,6 +229,15 @@ class Viewer(QMainWindow, form_class):
         img_gauss = np.require(img_gauss, np.uint8, 'C')
         self.img2label(img_gauss)
         QApplication.restoreOverrideCursor()
+        '''
+        img = cv2.imread(self.fName)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        dst2 = cv2.GaussianBlur(img,(5,5),0)
+        image = QImage(dst2, dst2.shape[1], dst2.shape[0], dst2.shape[1] * 3, QImage.Format_RGB888)
+        self.qPixmapVar = QPixmap(image)
+        self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
+        self.label.setPixmap(self.qPixmapVar)'''
+
 
 
     def folderselect(self):
@@ -239,7 +256,7 @@ class Viewer(QMainWindow, form_class):
             self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
             self.label.setPixmap(self.qPixmapVar)
 
-    #웹캠에서 사진 촬영 후 폴더에 저장
+    #camera에서 on버튼을 클릭한 후 take pickture 버튼을 누르면 윀캠으로 사진이 촬영되고, 지정된 폴더에 저장.
     def camera(self):
         self.frame = None
         cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
@@ -283,7 +300,21 @@ class Viewer(QMainWindow, form_class):
     def rotation(self):
         angle = self.w.horizontalSlider.value()
         print("%d 도로 회전합니다." % angle)
-        blurImg = blurs.angle_rotate(self.img, self.img_height_origin, self.img_width_origin)
+        '''rad = np.pi / (180.0 / angle)
+        x0 = self.img_height_origin // 2
+        y0 = self.img_height_origin // 2
+
+        newImg = np.zeros((self.img_height_origin, self.img_width_origin, 3)).astype('uint8')
+
+        for k in range(3):
+            for i in range(self.img_height_origin):
+                for j in range(self.img_width_origin):
+                    x = int((i - x0) * np.cos(rad) - (j - y0) * np.sin(rad) + x0)
+                    y = int((i - x0) * np.sin(rad) - (j - y0) * np.cos(rad) + y0)
+                    if (x<self.img_height_origin) and (x>=0):
+                        if (y<self.img_width_origin) and (y>=0):
+                            newImg[x ,y,k] = self.img[i,j,k]'''
+        blurImg = blurs.angle_rotate(self.img, angle, self.img_height_origin, self.img_width_origin)
         blurImg = np.require(blurImg, np.uint8, 'C')
         self.img2label(blurImg)
 
@@ -292,7 +323,7 @@ class Viewer(QMainWindow, form_class):
         self.testname = self.Imagelist.moveNext()
         self.fName = self.testname
 
-        self.qPixmapVar = QPixmap(self.file2Image(self.testname))
+        self.qPixmapVar = QPixmap(self.file2Image(self.fName))
         self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
 
         self.label.setPixmap(self.qPixmapVar)

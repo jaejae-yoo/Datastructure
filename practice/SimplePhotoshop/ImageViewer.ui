@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>PhotoEditor</class>
+ <widget class="QMainWindow" name="PhotoEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>700</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PhotoEditor</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>0</y>
+      <width>600</width>
+      <height>600</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="movenextButton">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>610</y>
+      <width>91</width>
+      <height>30</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Next</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pictureButton">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>610</y>
+      <width>91</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>take pictures</string>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menufile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <widget class="QMenu" name="menuOpen">
+     <property name="title">
+      <string>Open</string>
+     </property>
+     <addaction name="actionFile_Select"/>
+     <addaction name="actionFolder_Select"/>
+    </widget>
+    <addaction name="menuOpen"/>
+    <addaction name="actionexit"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <widget class="QMenu" name="Blur">
+     <property name="title">
+      <string>Blur</string>
+     </property>
+     <addaction name="actionmedian"/>
+     <addaction name="actiongaussian"/>
+    </widget>
+    <widget class="QMenu" name="menushift">
+     <property name="title">
+      <string>shift</string>
+     </property>
+     <addaction name="actioneast"/>
+     <addaction name="actionwest"/>
+     <addaction name="actionsouth"/>
+     <addaction name="actionnorth"/>
+    </widget>
+    <addaction name="actiontoGray"/>
+    <addaction name="actionRotation"/>
+    <addaction name="menushift"/>
+    <addaction name="Blur"/>
+    <addaction name="actionCrop"/>
+   </widget>
+   <widget class="QMenu" name="menuCamera">
+    <property name="title">
+     <string>Camera</string>
+    </property>
+    <addaction name="actionon"/>
+   </widget>
+   <addaction name="menufile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuCamera"/>
+  </widget>
+  <action name="actionexit">
+   <property name="text">
+    <string>exit</string>
+   </property>
+  </action>
+  <action name="actionFile_Select">
+   <property name="text">
+    <string>FIle Select</string>
+   </property>
+  </action>
+  <action name="actionFolder_Select">
+   <property name="text">
+    <string>Folder Select</string>
+   </property>
+  </action>
+  <action name="actiontoGray">
+   <property name="text">
+    <string>ToGray</string>
+   </property>
+  </action>
+  <action name="actionRotation">
+   <property name="text">
+    <string>Rotation</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>median</string>
+   </property>
+  </action>
+  <action name="actionmedian">
+   <property name="text">
+    <string>median</string>
+   </property>
+  </action>
+  <action name="actiongaussian">
+   <property name="text">
+    <string>gaussian</string>
+   </property>
+  </action>
+  <action name="actioneast">
+   <property name="text">
+    <string>east</string>
+   </property>
+  </action>
+  <action name="actionwest">
+   <property name="text">
+    <string>west</string>
+   </property>
+  </action>
+  <action name="actionsouth">
+   <property name="text">
+    <string>south</string>
+   </property>
+  </action>
+  <action name="actionnorth">
+   <property name="text">
+    <string>north</string>
+   </property>
+  </action>
+  <action name="actioncamera">
+   <property name="text">
+    <string>camera</string>
+   </property>
+  </action>
+  <action name="actionon">
+   <property name="text">
+    <string>on</string>
+   </property>
+  </action>
+  <action name="actionCrop">
+   <property name="text">
+    <string>Crop</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
