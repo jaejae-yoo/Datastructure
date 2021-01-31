@@ -11,7 +11,6 @@ import numpy as np
 from matplotlib import pyplot as plt
 import blurs
 
-
 class Node:
     def __init__(self, item = None, link=None):
         self.item = item
@@ -154,7 +153,7 @@ class Viewer(QMainWindow, form_class):
         self.label.setPixmap(self.qPixmapVar)
 
     def fileselect(self):
-        self.fName = QFileDialog.getOpenFileName(self, 'Open file','C:/Users/wotj1/PycharmProjects/software_project/picture', "Image files (*.jpg)")[0]
+        self.fName = QFileDialog.getOpenFileName(self, 'Open file','불러올 사진 저장 경로', "Image files (*.jpg)")[0]
         self.img = cv2.imread(self.fName)
         self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
         self.img_height_origin = self.img.shape[0]
@@ -189,8 +188,6 @@ class Viewer(QMainWindow, form_class):
     def crop(self):
         self.cropEnable = True
         self.hw_ratio = self.img_height_origin/self.img_width_origin
-        #print(self.img_height_origin, self.img_width_origin)
-
 
         if self.hw_ratio > 1: #세로가 더 큰 사진
             self.img_height_tran = self.hh
@@ -206,37 +203,24 @@ class Viewer(QMainWindow, form_class):
         else:
             self.startPos = QPoint(0, (self.hh-self.img_height_tran)//2)
             self.endPos = QPoint(self.hh, self.startPos.y()+self.img_height_tran)
-        #print(self.startPos, self.endPos)
 
     def median(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        img_median = blurs.median_filter(self.img, 3,self.img_height_origin, self.img_width_origin)
-        img_median = np.require(img_median, np.uint8, 'C')
-        self.img2label(img_median)
-        QApplication.restoreOverrideCursor()
-        ''' cv2로 구현
         img = cv2.imread(self.fName)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         dst4 = cv2.medianBlur(img, 9)
         image = QImage(dst4, dst4.shape[1], dst4.shape[0], dst4.shape[1] * 3, QImage.Format_RGB888)
         self.qPixmapVar = QPixmap(image)
         self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
-        self.label.setPixmap(self.qPixmapVar)'''
+        self.label.setPixmap(self.qPixmapVar)
 
     def gaussian(self):
-        QApplication.setOverrideCursor(Qt.WaitCursor)
-        img_gauss = blurs.gauss_filter(self.img, self.img_height_origin, self.img_width_origin)
-        img_gauss = np.require(img_gauss, np.uint8, 'C')
-        self.img2label(img_gauss)
-        QApplication.restoreOverrideCursor()
-        '''
         img = cv2.imread(self.fName)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         dst2 = cv2.GaussianBlur(img,(5,5),0)
         image = QImage(dst2, dst2.shape[1], dst2.shape[0], dst2.shape[1] * 3, QImage.Format_RGB888)
         self.qPixmapVar = QPixmap(image)
         self.qPixmapVar = self.qPixmapVar.scaled(700, 400, aspectRatioMode=True)
-        self.label.setPixmap(self.qPixmapVar)'''
+        self.label.setPixmap(self.qPixmapVar)
 
 
 
@@ -300,7 +284,7 @@ class Viewer(QMainWindow, form_class):
     def rotation(self):
         angle = self.w.horizontalSlider.value()
         print("%d 도로 회전합니다." % angle)
-        '''rad = np.pi / (180.0 / angle)
+        rad = np.pi / (180.0 / angle)
         x0 = self.img_height_origin // 2
         y0 = self.img_height_origin // 2
 
@@ -313,10 +297,7 @@ class Viewer(QMainWindow, form_class):
                     y = int((i - x0) * np.sin(rad) - (j - y0) * np.cos(rad) + y0)
                     if (x<self.img_height_origin) and (x>=0):
                         if (y<self.img_width_origin) and (y>=0):
-                            newImg[x ,y,k] = self.img[i,j,k]'''
-        blurImg = blurs.angle_rotate(self.img, angle, self.img_height_origin, self.img_width_origin)
-        blurImg = np.require(blurImg, np.uint8, 'C')
-        self.img2label(blurImg)
+                            newImg[x ,y,k] = self.img[i,j,k]
 
     def movenext(self):
         self.idx +=1
